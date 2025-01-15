@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIP and SWP Calculator</title> <!-- Bootstrap CSS for styling -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+      body {
+        background-color: #f8f9fa;
+        padding-top: 50px;
+      }
+
+      .calculator-container {
+        max-width: 600px;
+        margin: auto;
+        padding: 30px;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .result-box {
+        margin-top: 30px;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        background-color: #f1f1f1;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="calculator-container">
+
+        <!-- SIP Calculator Form -->
+        <h4>SIP Future Value Calculator</h4>
+        <form id="sipForm">
+          <div class="mb-3">
+            <label for="monthlyInvestment" class="form-label">Monthly SIP Amount (₹):</label>
+            <input type="number" class="form-control" id="monthlyInvestment" required>
+          </div>
+          <div class="mb-3">
+            <label for="annualRate" class="form-label">Annual Interest Rate (%):</label>
+            <input type="number" class="form-control" id="annualRate" required>
+          </div>
+          <div class="mb-3">
+            <label for="years" class="form-label">Investment Duration (Years):</label>
+            <input type="number" class="form-control" id="years" required>
+          </div>
+          <button type="button" class="btn btn-primary w-100" onclick="calculateSIPFV()">Calculate SIP FV</button>
+        </form>
+
+        <div class="result-box" id="sipResultBox" style="display: none;">
+          <h5 class="text-center">SIP Calculation Results</h5>
+          <p id="sipTotalInvestment"></p>
+          <p id="sipFutureValue"></p>
+          <p id="sipTotalReturn"></p>
+        </div>
+
+        <!-- SWP Calculator Form -->
+        <h4 class="mt-5">SWP Withdrawal Calculator</h4>
+        <form id="swpForm">
+          <div class="mb-3">
+            <label for="swpAmount" class="form-label">Withdrawal Amount per Month (₹):</label>
+            <input type="number" class="form-control" id="swpAmount" required>
+          </div>
+          <div class="mb-3">
+            <label for="swpAnnualRate" class="form-label">Annual Interest Rate (%):</label>
+            <input type="number" class="form-control" id="swpAnnualRate" required>
+          </div>
+          <div class="mb-3">
+            <label for="swpYears" class="form-label">Withdrawal Duration (Years):</label>
+            <input type="number" class="form-control" id="swpYears" required>
+          </div>
+          <button type="button" class="btn btn-primary w-100" onclick="calculateSWP()">Calculate SWP</button>
+        </form>
+
+        <div class="result-box" id="swpResultBox" style="display: none;">
+          <h5 class="text-center">SWP Calculation Results</h5>
+          <p id="swpTotalInvestment"></p>
+          <p id="swpFutureValue"></p>
+          <p id="swpTotalReturn"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap and JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Function to calculate SIP future value
+      function calculateSIPFV() {
+        // Get user input values for SIP
+        const monthlyInvestment = parseFloat(document.getElementById('monthlyInvestment').value);
+        const annualRate = parseFloat(document.getElementById('annualRate').value);
+        const years = parseInt(document.getElementById('years').value);
+
+        // Validate inputs
+        if (isNaN(monthlyInvestment) || isNaN(annualRate) || isNaN(years) || monthlyInvestment <= 0 || annualRate <= 0 || years <= 0) {
+          alert("Please enter valid values.");
+          return;
+        }
+
+        // Monthly interest rate
+        const monthlyRate = annualRate / 12 / 100;
+
+        // Total number of months
+        const months = years * 12;
+
+        // Future value calculation
+        const futureValue = monthlyInvestment * ((Math.pow(1 + monthlyRate, months) - 1) / monthlyRate) * (1 + monthlyRate);
+
+        // Total investment
+        const totalInvestment = monthlyInvestment * months;
+
+        // Calculate total return
+        const totalReturn = futureValue - totalInvestment;
+
+        // Display the results for SIP
+        document.getElementById('sipTotalInvestment').innerText = `Total Investment: ₹${formatNumberWithCommas(totalInvestment.toFixed(2))}`;
+        document.getElementById('sipFutureValue').innerText = `Future Value: ₹${formatNumberWithCommas(futureValue.toFixed(2))}`;
+        document.getElementById('sipTotalReturn').innerText = `Total Return: ₹${formatNumberWithCommas(totalReturn.toFixed(2))}`;
+
+        // Show SIP result box
+        document.getElementById('sipResultBox').style.display = 'block';
+      }
+
+      // Function to calculate SWP
+      function calculateSWP() {
+        // Get user input values for SWP
+        const swpAmount = parseFloat(document.getElementById('swpAmount').value);
+        const swpAnnualRate = parseFloat(document.getElementById('swpAnnualRate').value);
+        const swpYears = parseInt(document.getElementById('swpYears').value);
+
+        // Validate inputs
+        if (isNaN(swpAmount) || isNaN(swpAnnualRate) || isNaN(swpYears) || swpAmount <= 0 || swpAnnualRate <= 0 || swpYears <= 0) {
+          alert("Please enter valid values.");
+          return;
+        }
+
+        // Monthly interest rate for SWP
+        const monthlyRate = swpAnnualRate / 12 / 100;
+
+        // Total number of months for SWP
+        const months = swpYears * 12;
+
+        // Formula to calculate the future value based on withdrawals
+        const futureValueSWP = swpAmount * ((1 - Math.pow(1 + monthlyRate, -months)) / monthlyRate);
+
+        // Display the results for SWP
+        document.getElementById('swpTotalInvestment').innerText = `Total Investment (Required): ₹${formatNumberWithCommas(futureValueSWP.toFixed(2))}`;
+        document.getElementById('swpFutureValue').innerText = `Future Value of Withdrawal Plan: ₹${formatNumberWithCommas(futureValueSWP.toFixed(2))}`;
+        document.getElementById('swpTotalReturn').innerText = `Total Return (if applicable): ₹0`; // No return calculated in this simple case.
+
+        // Show SWP result box
+        document.getElementById('swpResultBox').style.display = 'block';
+      }
+
+      // Function to format number with commas
+      function formatNumberWithCommas(num) {
+        return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      }
+    </script>
+  </body>
+</html>
